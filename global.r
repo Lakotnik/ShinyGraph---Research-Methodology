@@ -10,10 +10,10 @@ pkgTest <- function(x)
 }
 pkgTest("WHO")
 pkgTest("shiny")
+pkgTest("dplyr")
 pkgTest("stringr")
 pkgTest("ggplot2")
-pkgTest("googleVis")
-pkgTest("googleVis")
+pkgTest("plotly")
 
 
 # Initialize Dependencies
@@ -22,7 +22,7 @@ library(WHO)
 library(dplyr)
 library(stringr)
 library(ggplot2)
-library(googleVis)
+library(plotly)
 
 
 
@@ -39,46 +39,34 @@ library(googleVis)
 
 # Life Expectancy
 setup <- get_data("WHOSIS_000001")
+setup <- subset(setup, sex == "Both sexes")
 attach(setup)
-intermed <- subset(setup, year == "2014")
-detach(setup)
-attach(intermed)
-intermed2 <- subset(intermed, sex == "Both sexes")
-detach(intermed)
-attach(intermed2)
 lifeExpect <- data.frame(year, country, value)
-detach(intermed2)
+detach(setup)
 lifeExpect <- na.omit(lifeExpect)
 lifeExpect <- lifeExpect[order(lifeExpect$country),]
-lifeExpect <- rename(lifeExpect, replace = c(value = lifeExpect))
+names(lifeExpect) <- c("year","country","lifeExpect")
 
 # Per Capita Health Spending
 setup <- get_data("WHS7_105")
 attach(setup)
-perCapita <- data.frame(year, country, value)
-perCapita <- subset(perCapita, year == "2014")
+perCapita <- data.frame(year, country, value, worldbankincomegroup)
 detach(setup)
-attach(perCapita)
-perCapita <- data.frame(country, value)
-detach(perCapita)
 perCapita <- na.omit(perCapita)
 perCapita <- perCapita[order(perCapita$country),]
-perCapita <- rename(perCapita, replace = c(value = perCapita))
+names(perCapita) <- c("year","country","perCapita","income")
 
 # Percent of GDP Health spending
 setup <- get_data("WHS7_143")
 attach(setup)
 perCent <- data.frame(year, country, value)
-perCent <- subset(perCent, year == "2014")
 detach(setup)
-attach(perCent)
-perCent <- data.frame(country, value)
-detach(perCent)
 perCent <- na.omit(perCent)
 perCent <- perCent[order(perCent$country),]
-perCent <- rename(perCent, replace = c(value = perCent))
+names(perCent) <- c("year","country","perCent")
+
 
 # Merge the data sets (order matters because of variable reassignment)
-perCapita <- merge(lifeExpect, perCapita, by="country")
-full <- merge(perCapita, perCent, by="country")
-perCent <- merge(lifeExpect, perCent, by="country")
+perCapita <- merge(perCapita, lifeExpect, by=c("country","year"))
+final <- merge(perCapita, perCent, by=c("country","year"))
+final$income <- as.factor(final$income)

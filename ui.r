@@ -3,12 +3,16 @@ ui <- fluidPage(
   theme = "superhero",
   sidebarLayout(
     sidebarPanel(
-      selectInput("select", label = "Primary Data", choices = list("Per Capita Expenditure" = 1,"Percent of GDP Expenditure" = 2, selected = 1))
+      sliderInput("YEAR",
+                  label = "Year",
+                  min = min(final$year),
+                  max = max(final$year),
+                  value = min(final$year),
+                  animate = TRUE
+      )
     ),
     mainPanel(
-      plotOutput("plot"),
-      br(),
-      tableOutput("table")
+      plotlyOutput("plot")
     )
   )
 )
@@ -19,7 +23,7 @@ ui <- fluidPage(
 # expenditure data but plotted against time
 # as well. At this point, I considered scrapping
 # it all and starting over, but I had already
-# invested well over 10 hours into research
+# invested well over 18 hours into research
 # and how to's and refining the data sets
 # so I had to stick with it. 
 # What I'm referring to, of course, is this
